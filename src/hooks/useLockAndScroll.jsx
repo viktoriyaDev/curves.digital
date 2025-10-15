@@ -9,7 +9,7 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 		const IS_TOUCH_DEVICE = window.matchMedia("(pointer: coarse)").matches;
 		let locked = false;
 
-		// --- shared lock helpers ---
+		// --- Shared lock helpers ---
 		const lock = () => {
 			if (!locked) {
 				document.body.style.overflowY = "hidden";
@@ -28,14 +28,14 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 
 		// ---------------- DESKTOP LOGIC (unchanged) ----------------
 		const onWheelDesktop = (e) => {
-			if (IS_TOUCH_DEVICE) return; // skip if touch
+			if (IS_TOUCH_DEVICE) return; // skip on touch devices
 			if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
 				if (!locked) lock();
 				return;
 			}
 			if (!locked) lock();
 			e.preventDefault();
-			scroller.scrollLeft += e.deltaY; // smooth precise scroll
+			scroller.scrollLeft += e.deltaY; // same precise desktop scroll
 		};
 
 		// ---------------- MOBILE / TABLET LOGIC ----------------
@@ -46,11 +46,11 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 		let velocity = 0;
 		let momentumID = null;
 
-		// ⚡ Fast inertia (mobile only)
+		// ⚡ Fast, short momentum (mobile only)
 		const smoothMomentum = () => {
 			if (Math.abs(velocity) < 0.2) return;
 			scroller.scrollLeft -= velocity;
-			velocity *= 0.85; // 4× faster decay (was ~0.96)
+			velocity *= 0.75; // 4× faster decay (was 0.96)
 			momentumID = requestAnimationFrame(smoothMomentum);
 		};
 
@@ -72,12 +72,12 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 			const deltaX = touchX - lastTouchX;
 			const deltaY = touchY - touchStartY;
 
-			// horizontal priority only
+			// horizontal scroll priority
 			if (Math.abs(deltaX) > Math.abs(deltaY)) {
 				e.preventDefault();
-				const speedFactor = 17.5; // 2.5× faster scroll (was ~7)
+				const speedFactor = 28; // 4× faster than base (~7)
 				scroller.scrollLeft -= deltaX * speedFactor;
-				velocity = deltaX * (speedFactor + 2);
+				velocity = deltaX * (speedFactor + 2.5); // faster inertia
 			}
 
 			lastTouchX = touchX;
@@ -90,13 +90,13 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 			unlock();
 		};
 
-		// --- scroll behavior settings ---
+		// --- Scroll performance tuning ---
 		scroller.style.scrollBehavior = "smooth";
 		scroller.style.webkitOverflowScrolling = "touch";
 		scroller.style.touchAction = "pan-x";
 		scroller.style.willChange = "scroll-position";
 
-		// --- listeners ---
+		// --- Event listeners ---
 		if (IS_TOUCH_DEVICE) {
 			wrapper.addEventListener("touchstart", onTouchStart, { passive: false });
 			wrapper.addEventListener("touchmove", onTouchMove, { passive: false });
@@ -108,7 +108,7 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 			scroller.addEventListener("wheel", onWheelDesktop, { passive: false });
 		}
 
-		// --- cleanup ---
+		// --- Cleanup ---
 		return () => {
 			wrapper.removeEventListener("mouseenter", lock);
 			wrapper.removeEventListener("mouseleave", unlock);
