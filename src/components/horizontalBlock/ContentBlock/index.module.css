@@ -100,7 +100,7 @@
 @media (max-width: 360px) {
 	.block {
 		width: 328px;
-		padding-right: 25px;
+		padding-right: 5px;
 	}
 
 	.content {
