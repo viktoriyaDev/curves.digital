@@ -87,13 +87,12 @@
 	.scrollContainer > *:first-child {
 		min-width: unset;
 		padding-left: 0;
-
 	}
 	.scrollContainer:first-child {
 		min-width: unset;
-	
+		min-width: 275px;
 	}
-	
+
 	.scrollContainer > *:last-child {
 		margin-right: 60px;
 	}
@@ -117,7 +116,6 @@
 		display: inline-block;
 		width: 100%;
 	}
-
 }
 
 /* ===============================
