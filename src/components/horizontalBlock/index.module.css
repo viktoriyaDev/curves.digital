@@ -53,6 +53,9 @@
 	flex: 0 0 40%;
 	min-width: 600px;
 	scroll-snap-align: start;
+	-webkit-overflow-scrolling: touch;
+	scroll-behavior: smooth;
+	touch-action: pan-x;
 
 	/* Prevent flex jitter in Safari */
 	min-height: 1px;

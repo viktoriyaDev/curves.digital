@@ -85,7 +85,7 @@
 	}
 
 	.content {
-		max-width: 275px;
+		min-width: 275px;
 		padding-right: 48px;
 		gap: 24px;
 	}

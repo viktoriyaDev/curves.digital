@@ -32,17 +32,18 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 		};
 
 		const onWheel = (e) => {
-			if (isTouchDevice) return; // не мешаем мобильным
+			if (isTouchDevice) return;
 			if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
 			e.preventDefault();
 			lock();
-			scroller.scrollLeft += e.deltaY;
+			scroller.scrollLeft += e.deltaY * 1.2; // немного быстрее
 		};
 
+		// инерция — более “быстрая” и живая
 		const smoothMomentum = () => {
-			if (Math.abs(velocity) < 0.3) return;
+			if (Math.abs(velocity) < 0.6) return;
 			scroller.scrollLeft -= velocity;
-			velocity *= 0.95;
+			velocity *= 0.93; // меньшее трение — быстрее
 			momentumID = requestAnimationFrame(smoothMomentum);
 		};
 
@@ -63,11 +64,11 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 			const deltaX = touchX - lastTouchX;
 			const deltaY = touchY - touchStartY;
 
-			// Горизонтальный свайп → активируем скролл
+			// движение горизонтальное → реагируем быстро
 			if (Math.abs(deltaX) > Math.abs(deltaY)) {
 				e.preventDefault();
-				scroller.scrollLeft -= deltaX;
-				velocity = deltaX;
+				scroller.scrollLeft -= deltaX * 1.25; // ускоряем реакцию
+				velocity = deltaX * 1.5; // усиливаем инерцию
 			}
 
 			lastTouchX = touchX;
@@ -80,11 +81,10 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 			unlock();
 		};
 
-		// Добавим плавный нативный скролл
+		// Нативная плавность
 		scroller.style.scrollBehavior = "smooth";
 		scroller.style.webkitOverflowScrolling = "touch";
 
-		// Привязки событий
 		if (!isTouchDevice) {
 			wrapper.addEventListener("mouseenter", lock);
 			wrapper.addEventListener("mouseleave", unlock);
