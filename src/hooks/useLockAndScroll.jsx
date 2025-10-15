@@ -25,6 +25,7 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 			}
 		};
 
+		// --- DESKTOP LOGIC (unchanged) ---
 		const onWheelDesktop = (e) => {
 			if (IS_TOUCH_DEVICE) return;
 			if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
@@ -36,26 +37,22 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 			scroller.scrollLeft += e.deltaY;
 		};
 
+		// --- MOBILE LOGIC (no damping, continuous inertia) ---
 		let isTouching = false;
 		let touchStartX = 0;
 		let touchStartY = 0;
 		let lastTouchX = 0;
 		let velocity = 0;
 		let momentumID = null;
-		let momentumSteps = 0;
 
-		const smoothMomentum = () => {
-			if (Math.abs(velocity) < 0.1 || momentumSteps > 720) return;
+		const continueMomentum = () => {
 			scroller.scrollLeft -= velocity;
-			velocity *= 0.45;
-			momentumSteps++;
-			momentumID = requestAnimationFrame(smoothMomentum);
+			momentumID = requestAnimationFrame(continueMomentum);
 		};
 
 		const onTouchStart = (e) => {
 			isTouching = true;
 			cancelAnimationFrame(momentumID);
-			momentumSteps = 0;
 			touchStartX = e.touches[0].clientX;
 			touchStartY = e.touches[0].clientY;
 			lastTouchX = touchStartX;
@@ -72,9 +69,9 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 
 			if (Math.abs(deltaX) > Math.abs(deltaY)) {
 				e.preventDefault();
-				const speedFactor = 63;
+				const speedFactor = 80; // fast mobile scroll
 				scroller.scrollLeft -= deltaX * speedFactor;
-				velocity = deltaX * (speedFactor + 3);
+				velocity = deltaX * speedFactor;
 			}
 
 			lastTouchX = touchX;
@@ -83,8 +80,7 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 		const onTouchEnd = () => {
 			isTouching = false;
 			cancelAnimationFrame(momentumID);
-			momentumSteps = 0;
-			momentumID = requestAnimationFrame(smoothMomentum);
+			momentumID = requestAnimationFrame(continueMomentum);
 			unlock();
 		};
 
