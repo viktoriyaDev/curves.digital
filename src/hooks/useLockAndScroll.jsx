@@ -45,9 +45,9 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 		let momentumSteps = 0;
 
 		const smoothMomentum = () => {
-			if (Math.abs(velocity) < 0.1 || momentumSteps > 360) return;
+			if (Math.abs(velocity) < 0.1 || momentumSteps > 720) return;
 			scroller.scrollLeft -= velocity;
-			velocity *= 0.9;
+			velocity *= 0.45;
 			momentumSteps++;
 			momentumID = requestAnimationFrame(smoothMomentum);
 		};
@@ -72,7 +72,7 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 
 			if (Math.abs(deltaX) > Math.abs(deltaY)) {
 				e.preventDefault();
-				const speedFactor = 21;
+				const speedFactor = 63;
 				scroller.scrollLeft -= deltaX * speedFactor;
 				velocity = deltaX * (speedFactor + 3);
 			}
