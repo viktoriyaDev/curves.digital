@@ -1,0 +1,44 @@
+.scrollIndicator {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--color-gray-500);
+	font-family: "Suisse Intl", sans-serif;
+	font-size: 16px;
+	letter-spacing: -0.2px;
+	text-transform: none;
+}
+
+.divider {
+	flex-grow: 1;
+	height: 2px;
+	background-color: #4a4a4a;
+	opacity: 0.6;
+}
+
+.text {
+	font-family: "Suisse Intl", sans-serif;
+	font-weight: 500;
+	font-size: 16px;
+	line-height: 24px;
+	letter-spacing: 0;
+	color: var(--color-gray-500);
+
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .scrollIndicator {
+    font-size: 14px;
+    gap: 4px;
+  }
+
+		.text	{
+				font-size: 14px;
+		}
+
+  .divider {
+    height: 1px;
+  }
+}

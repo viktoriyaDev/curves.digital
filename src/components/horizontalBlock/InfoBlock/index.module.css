@@ -1,0 +1,40 @@
+.title {
+	font-family: "Gramatika", sans-serif;
+	font-weight: 400;
+	font-size: 64px;
+	line-height: 0.85;
+	letter-spacing: 1.5px;
+	color: #fff;
+	max-width: 444px;
+}
+
+.title span {
+	font-weight: 700;
+}
+
+.infoBlock {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	min-width: fit-content;
+	gap: 72px;
+	text-align: left;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+	.infoBlock button {
+		display: none;
+	}
+
+	.title {
+		font-size: 40px;
+		line-height: 1.1;
+	}
+
+	.infoBlock {
+		padding-right: 0;
+		text-align: left;
+		align-items: flex-start;
+	}
+}

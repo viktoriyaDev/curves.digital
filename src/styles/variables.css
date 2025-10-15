@@ -1,0 +1,28 @@
+:root {
+	/* базовые цвета */
+	--color-white: #ffffff;
+	--color-black: #000000;
+	--color-main-black: #1a1a1a;
+
+	--color-gray-100: #f5f5f5;
+	--color-gray-300: #d1d1d1;
+	--color-gray-500: #a6a6a6;
+	--color-gray-700: #4a4a4a;
+
+	--color-green-100: #6cc989;
+	--color-green-200: #3aa65e;
+
+	/* фирменные */
+	--color-primary: #2222ff;
+	--color-secondary: #ff0066;
+	--color-accent: #00c896;
+
+	/* тексты */
+	--text-main: var(--color-black);
+	--text-light: var(--color-gray-700);
+	--text-invert: var(--color-white);
+
+	/* фон */
+	--bg-main: var(--color-white);
+	--bg-muted: var(--color-gray-100);
+}

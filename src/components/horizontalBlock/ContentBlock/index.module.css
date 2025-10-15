@@ -1,0 +1,118 @@
+.block {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	scroll-snap-align: start;
+	gap: 16px;
+	color: #fff;
+	min-width: 45%;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	 /* box-sizing: border-box; */
+}
+
+.content {
+	display: flex;
+	flex-direction: column;
+	gap: 32px;
+	padding-right: 120px;
+}
+
+.textContent {
+	display: flex;
+	flex-direction: column;
+	max-width: 400px;
+	gap: 8px;
+	padding-right: 24px;
+}
+
+.title {
+	font-family: "Gramatika", sans-serif;
+	font-weight: 500;
+	font-size: 40px;
+	line-height: 42px;
+	letter-spacing: -0.8px;
+	font-variant-numeric: lining-nums proportional-nums;
+	color: var(--color-white);
+	text-rendering: optimizeLegibility;
+	word-break: break-word;
+}
+
+.description {
+	font-family: "Suisse Intl", sans-serif;
+	font-weight: 400;
+	font-size: 18px;
+	line-height: 1.5;
+	letter-spacing: 0;
+	color: var(--color-gray-500);
+	max-width: 520px;
+	text-align: justify;
+	text-justify: inter-word;
+	hyphens: auto;
+	-webkit-hyphens: auto;
+	-ms-hyphens: auto;
+	word-break: break-word;
+}
+
+.imageWrapper {
+	max-width: 520px;
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+.image {
+	width: 100%;
+	height: auto;
+	display: block;
+	border-radius: 12px;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+	.block {
+		gap: 8px;
+		padding-right: 15px;
+	}
+
+	.title {
+		font-size: 24px;
+		line-height: 1.1;
+	}
+
+	.description {
+		text-align: initial;
+		font-size: 16px;
+	}
+
+	.content {
+		max-width: 275px;
+		padding-right: 48px;
+		gap: 24px;
+	}
+
+	.textContent {
+		max-width: 100%;
+		padding-right: 0;
+	}
+}
+
+/* Mobile */
+@media (max-width: 360px) {
+	.block {
+		width: 328px;
+		padding-right: 25px;
+	}
+
+	.content {
+		width: 275px;
+		padding-right: 10px;
+	}
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+	* {
+		transition: none !important;
+		animation: none !important;
+	}
+}

@@ -1,0 +1,129 @@
+/* ===============================
+   HorizontalBlock Layout
+   =============================== */
+
+.wrapper {
+	display: flex;
+	width: 100%;
+	gap: 24px;
+	padding: 120px 60px 60px 60px;
+	background-color: var(--color-main-black);
+	overflow: hidden;
+
+	/* Cross-browser GPU boost */
+	will-change: transform;
+	backface-visibility: hidden;
+	-webkit-transform: translateZ(0);
+}
+
+/* ===============================
+   Scroll Container
+   =============================== */
+
+.scrollContainer {
+	display: flex;
+	flex: 1 1 auto;
+	gap: 8px;
+
+	/* Scroll behavior */
+	overflow-x: auto;
+	overflow-y: hidden;
+	scroll-snap-type: x mandatory;
+	scroll-behavior: smooth;
+
+	/* Cross-browser scroll optimizations */
+	-webkit-overflow-scrolling: touch; /* iOS smoothness */
+	scrollbar-width: none; /* Firefox */
+	touch-action: pan-y; /* prevent accidental zooms on touchpads */
+}
+
+.scrollContainer > *:first-child {
+	padding-left: 40px;
+	min-width: unset;
+	min-width: 527px;
+}
+
+/* Hide scrollbar in WebKit browsers */
+.scrollContainer::-webkit-scrollbar {
+	display: none;
+}
+
+/* Child elements within horizontal scroll */
+.scrollContainer > * {
+	flex: 0 0 40%;
+	min-width: 600px;
+	scroll-snap-align: start;
+
+	/* Prevent flex jitter in Safari */
+	min-height: 1px;
+}
+
+/* ===============================
+   Button visibility
+   =============================== */
+
+.tabletButton {
+	display: none;
+}
+
+/* ===============================
+   Tablet (≤768px)
+   =============================== */
+
+@media (max-width: 768px) {
+	.wrapper {
+		flex-direction: column;
+		gap: 48px;
+		padding: 56px 40px 60px;
+
+		/* Fix Safari flex rendering */
+		-webkit-flex-direction: column;
+	}
+
+	.scrollContainer {
+		scroll-snap-type: none; /* disable snapping for shorter widths */
+	}
+
+	.scrollContainer > *:first-child {
+		min-width: unset;
+		padding-left: 0;
+
+	}
+	.scrollContainer:first-child {
+		min-width: unset;
+	
+	}
+	.scrollContainer > *:last-child {
+		margin-right: 20px;
+	}
+
+	.scrollContainer > * {
+		width: 100%;
+		min-width: unset;
+	}
+}
+
+/* ===============================
+   Mobile (≤360px)
+   =============================== */
+
+@media (max-width: 360px) {
+	.wrapper {
+		padding: 56px 16px 72px 30px;
+	}
+
+	.tabletButton {
+		display: inline-block;
+		width: 100%;
+	}
+}
+
+/* ===============================
+   Accessibility & Motion Preferences
+   =============================== */
+
+@media (prefers-reduced-motion: reduce) {
+	.scrollContainer {
+		scroll-behavior: auto;
+	}
+}
