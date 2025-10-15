@@ -37,7 +37,7 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 			scroller.scrollLeft += e.deltaY;
 		};
 
-		// --- MOBILE LOGIC (no damping, continuous inertia) ---
+		// --- MOBILE LOGIC (faster scroll, inertia continues, no damping) ---
 		let isTouching = false;
 		let touchStartX = 0;
 		let touchStartY = 0;
@@ -47,7 +47,7 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 
 		const continueMomentum = () => {
 			scroller.scrollLeft -= velocity;
-			momentumID = requestAnimationFrame(continueMomentum);
+			requestAnimationFrame(continueMomentum);
 		};
 
 		const onTouchStart = (e) => {
@@ -69,7 +69,7 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 
 			if (Math.abs(deltaX) > Math.abs(deltaY)) {
 				e.preventDefault();
-				const speedFactor = 80; // fast mobile scroll
+				const speedFactor = 63 * 2; // 2× faster scroll speed
 				scroller.scrollLeft -= deltaX * speedFactor;
 				velocity = deltaX * speedFactor;
 			}
