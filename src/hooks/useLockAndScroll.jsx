@@ -37,7 +37,7 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 			scroller.scrollLeft += e.deltaY;
 		};
 
-		// --- MOBILE LOGIC (modified for infinite inertia & faster scroll) ---
+		// --- MOBILE LOGIC (no damping, continuous inertia) ---
 		let isTouching = false;
 		let touchStartX = 0;
 		let touchStartY = 0;
@@ -45,14 +45,9 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 		let velocity = 0;
 		let momentumID = null;
 
-		const smoothMomentum = () => {
-			if (Math.abs(velocity) < 0.05) {
-				momentumID = requestAnimationFrame(smoothMomentum);
-				return;
-			}
+		const continueMomentum = () => {
 			scroller.scrollLeft -= velocity;
-			velocity *= 0.98; 
-			momentumID = requestAnimationFrame(smoothMomentum);
+			momentumID = requestAnimationFrame(continueMomentum);
 		};
 
 		const onTouchStart = (e) => {
@@ -74,9 +69,9 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 
 			if (Math.abs(deltaX) > Math.abs(deltaY)) {
 				e.preventDefault();
-				const speedFactor = 21;
+				const speedFactor = 80; // fast mobile scroll
 				scroller.scrollLeft -= deltaX * speedFactor;
-				velocity = deltaX * (speedFactor * 0.8);
+				velocity = deltaX * speedFactor;
 			}
 
 			lastTouchX = touchX;
@@ -85,7 +80,7 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 		const onTouchEnd = () => {
 			isTouching = false;
 			cancelAnimationFrame(momentumID);
-			momentumID = requestAnimationFrame(smoothMomentum);
+			momentumID = requestAnimationFrame(continueMomentum);
 			unlock();
 		};
 
