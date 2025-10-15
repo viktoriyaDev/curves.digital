@@ -9,7 +9,7 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 		const IS_TOUCH_DEVICE = window.matchMedia("(pointer: coarse)").matches;
 		let locked = false;
 
-		// --- Shared lock helpers ---
+		// --- shared lock helpers ---
 		const lock = () => {
 			if (!locked) {
 				document.body.style.overflowY = "hidden";
@@ -28,7 +28,7 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 
 		// ---------------- DESKTOP LOGIC (unchanged) ----------------
 		const onWheelDesktop = (e) => {
-			if (IS_TOUCH_DEVICE) return; // skip if touch device
+			if (IS_TOUCH_DEVICE) return; // skip if touch
 			if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
 				if (!locked) lock();
 				return;
@@ -46,11 +46,11 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 		let velocity = 0;
 		let momentumID = null;
 
-		// ⚡ Longer & faster inertia (mobile only)
+		// ⚡ Fast inertia (mobile only)
 		const smoothMomentum = () => {
-			if (Math.abs(velocity) < 0.15) return;
+			if (Math.abs(velocity) < 0.2) return;
 			scroller.scrollLeft -= velocity;
-			velocity *= 0.96; // slower decay → longer glide
+			velocity *= 0.85; // 4× faster decay (was ~0.96)
 			momentumID = requestAnimationFrame(smoothMomentum);
 		};
 
@@ -72,12 +72,12 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 			const deltaX = touchX - lastTouchX;
 			const deltaY = touchY - touchStartY;
 
-			// Horizontal scroll only
+			// horizontal priority only
 			if (Math.abs(deltaX) > Math.abs(deltaY)) {
 				e.preventDefault();
-				const speedFactor = 9; // fast & fluid scrolling
+				const speedFactor = 17.5; // 2.5× faster scroll (was ~7)
 				scroller.scrollLeft -= deltaX * speedFactor;
-				velocity = deltaX * (speedFactor + 2.5); // stronger momentum
+				velocity = deltaX * (speedFactor + 2);
 			}
 
 			lastTouchX = touchX;
@@ -90,13 +90,13 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 			unlock();
 		};
 
-		// --- Scroll performance tuning ---
+		// --- scroll behavior settings ---
 		scroller.style.scrollBehavior = "smooth";
 		scroller.style.webkitOverflowScrolling = "touch";
 		scroller.style.touchAction = "pan-x";
 		scroller.style.willChange = "scroll-position";
 
-		// --- Event listeners ---
+		// --- listeners ---
 		if (IS_TOUCH_DEVICE) {
 			wrapper.addEventListener("touchstart", onTouchStart, { passive: false });
 			wrapper.addEventListener("touchmove", onTouchMove, { passive: false });
@@ -108,7 +108,7 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 			scroller.addEventListener("wheel", onWheelDesktop, { passive: false });
 		}
 
-		// --- Cleanup ---
+		// --- cleanup ---
 		return () => {
 			wrapper.removeEventListener("mouseenter", lock);
 			wrapper.removeEventListener("mouseleave", unlock);
