@@ -94,7 +94,7 @@
 	
 	}
 	.scrollContainer > *:last-child {
-		margin-right: 20px;
+		margin-right: 40px;
 	}
 
 	.scrollContainer > * {
@@ -115,6 +115,10 @@
 	.tabletButton {
 		display: inline-block;
 		width: 100%;
+	}
+
+	.scrollContainer > *:last-child {
+		margin-right: 60px;
 	}
 }
 
