@@ -7,6 +7,7 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 		if (!wrapper || !scroller) return;
 
 		let locked = false;
+		let isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
 		let isTouching = false;
 		let touchStartX = 0;
 		let touchStartY = 0;
@@ -31,6 +32,7 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 		};
 
 		const onWheel = (e) => {
+			if (isTouchDevice) return; // не мешаем мобильным
 			if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
 			e.preventDefault();
 			lock();
@@ -38,9 +40,9 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 		};
 
 		const smoothMomentum = () => {
-			if (Math.abs(velocity) < 0.5) return; // остановка
+			if (Math.abs(velocity) < 0.3) return;
 			scroller.scrollLeft -= velocity;
-			velocity *= 0.95; // трение
+			velocity *= 0.95;
 			momentumID = requestAnimationFrame(smoothMomentum);
 		};
 
@@ -56,17 +58,16 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 
 		const onTouchMove = (e) => {
 			if (!isTouching) return;
-
 			const touchX = e.touches[0].clientX;
 			const touchY = e.touches[0].clientY;
 			const deltaX = touchX - lastTouchX;
 			const deltaY = touchY - touchStartY;
 
-			// если движение в основном горизонтальное
+			// Горизонтальный свайп → активируем скролл
 			if (Math.abs(deltaX) > Math.abs(deltaY)) {
 				e.preventDefault();
 				scroller.scrollLeft -= deltaX;
-				velocity = deltaX; // сохраняем скорость
+				velocity = deltaX;
 			}
 
 			lastTouchX = touchX;
@@ -79,9 +80,16 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 			unlock();
 		};
 
-		wrapper.addEventListener("mouseenter", lock);
-		wrapper.addEventListener("mouseleave", unlock);
-		scroller.addEventListener("wheel", onWheel, { passive: false });
+		// Добавим плавный нативный скролл
+		scroller.style.scrollBehavior = "smooth";
+		scroller.style.webkitOverflowScrolling = "touch";
+
+		// Привязки событий
+		if (!isTouchDevice) {
+			wrapper.addEventListener("mouseenter", lock);
+			wrapper.addEventListener("mouseleave", unlock);
+			scroller.addEventListener("wheel", onWheel, { passive: false });
+		}
 
 		wrapper.addEventListener("touchstart", onTouchStart, { passive: false });
 		wrapper.addEventListener("touchmove", onTouchMove, { passive: false });
