@@ -6,15 +6,10 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 		const scroller = scrollerRef.current;
 		if (!wrapper || !scroller) return;
 
+		const IS_TOUCH_DEVICE = window.matchMedia("(pointer: coarse)").matches;
 		let locked = false;
-		let isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
-		let isTouching = false;
-		let touchStartX = 0;
-		let touchStartY = 0;
-		let lastTouchX = 0;
-		let velocity = 0;
-		let momentumID = null;
 
+		// --- Shared lock helpers ---
 		const lock = () => {
 			if (!locked) {
 				document.body.style.overflowY = "hidden";
@@ -31,19 +26,31 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 			}
 		};
 
-		const onWheel = (e) => {
-			if (isTouchDevice) return;
-			if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+		// ---------------- DESKTOP LOGIC (unchanged) ----------------
+		const onWheelDesktop = (e) => {
+			if (IS_TOUCH_DEVICE) return; // skip if touch device
+			if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+				if (!locked) lock();
+				return;
+			}
+			if (!locked) lock();
 			e.preventDefault();
-			lock();
-			scroller.scrollLeft += e.deltaY * 1.2; // немного быстрее
+			scroller.scrollLeft += e.deltaY; // smooth precise scroll
 		};
 
-		// инерция — более “быстрая” и живая
+		// ---------------- MOBILE / TABLET LOGIC ----------------
+		let isTouching = false;
+		let touchStartX = 0;
+		let touchStartY = 0;
+		let lastTouchX = 0;
+		let velocity = 0;
+		let momentumID = null;
+
+		// ⚡ Longer & faster inertia (mobile only)
 		const smoothMomentum = () => {
-			if (Math.abs(velocity) < 0.6) return;
+			if (Math.abs(velocity) < 0.15) return;
 			scroller.scrollLeft -= velocity;
-			velocity *= 0.93; // меньшее трение — быстрее
+			velocity *= 0.96; // slower decay → longer glide
 			momentumID = requestAnimationFrame(smoothMomentum);
 		};
 
@@ -59,16 +66,18 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 
 		const onTouchMove = (e) => {
 			if (!isTouching) return;
+
 			const touchX = e.touches[0].clientX;
 			const touchY = e.touches[0].clientY;
 			const deltaX = touchX - lastTouchX;
 			const deltaY = touchY - touchStartY;
 
-			// движение горизонтальное → реагируем быстро
+			// Horizontal scroll only
 			if (Math.abs(deltaX) > Math.abs(deltaY)) {
 				e.preventDefault();
-				scroller.scrollLeft -= deltaX * 1.25; // ускоряем реакцию
-				velocity = deltaX * 1.5; // усиливаем инерцию
+				const speedFactor = 9; // fast & fluid scrolling
+				scroller.scrollLeft -= deltaX * speedFactor;
+				velocity = deltaX * (speedFactor + 2.5); // stronger momentum
 			}
 
 			lastTouchX = touchX;
@@ -81,24 +90,30 @@ export const useLockAndScroll = (wrapperRef, scrollerRef) => {
 			unlock();
 		};
 
-		// Нативная плавность
+		// --- Scroll performance tuning ---
 		scroller.style.scrollBehavior = "smooth";
 		scroller.style.webkitOverflowScrolling = "touch";
+		scroller.style.touchAction = "pan-x";
+		scroller.style.willChange = "scroll-position";
 
-		if (!isTouchDevice) {
+		// --- Event listeners ---
+		if (IS_TOUCH_DEVICE) {
+			wrapper.addEventListener("touchstart", onTouchStart, { passive: false });
+			wrapper.addEventListener("touchmove", onTouchMove, { passive: false });
+			wrapper.addEventListener("touchend", onTouchEnd);
+		} else {
 			wrapper.addEventListener("mouseenter", lock);
 			wrapper.addEventListener("mouseleave", unlock);
-			scroller.addEventListener("wheel", onWheel, { passive: false });
+			wrapper.addEventListener("wheel", onWheelDesktop, { passive: false });
+			scroller.addEventListener("wheel", onWheelDesktop, { passive: false });
 		}
 
-		wrapper.addEventListener("touchstart", onTouchStart, { passive: false });
-		wrapper.addEventListener("touchmove", onTouchMove, { passive: false });
-		wrapper.addEventListener("touchend", onTouchEnd);
-
+		// --- Cleanup ---
 		return () => {
 			wrapper.removeEventListener("mouseenter", lock);
 			wrapper.removeEventListener("mouseleave", unlock);
-			scroller.removeEventListener("wheel", onWheel);
+			wrapper.removeEventListener("wheel", onWheelDesktop);
+			scroller.removeEventListener("wheel", onWheelDesktop);
 			wrapper.removeEventListener("touchstart", onTouchStart);
 			wrapper.removeEventListener("touchmove", onTouchMove);
 			wrapper.removeEventListener("touchend", onTouchEnd);
